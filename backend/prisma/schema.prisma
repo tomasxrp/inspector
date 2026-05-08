@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  apellido    String
+  correo      String      @unique
+  contrasena  String
+  telefono    String
+  rut         String?
+  direccion   String?
+  propiedades Propiedad[]
+  revisiones  Revision[]
+}
+
+model Cliente {
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  apellido    String
+  correo      String      @unique
+  telefono    String
+  propiedades Propiedad[]
+}
+
+model Propiedad {
+  id             Int        @id @default(autoincrement())
+  id_usuario     Int
+  id_cliente     Int
+  tipo_propiedad String
+  direccion      String
+  comuna         String
+  info_adicional String?
+  usuario        Usuario    @relation(fields: [id_usuario], references: [id])
+  cliente        Cliente    @relation(fields: [id_cliente], references: [id])
+  revisiones     Revision[]
+}
+
+model Revision {
+  id                    Int               @id @default(autoincrement())
+  id_propiedad          Int
+  id_usuario            Int
+  fecha_revision        DateTime          @default(now())
+  categoria_observacion String
+  descripcion_general   String?           @db.Text
+  propiedad             Propiedad         @relation(fields: [id_propiedad], references: [id])
+  usuario               Usuario           @relation(fields: [id_usuario], references: [id])
+  fallas                Registro_falla[]
+  informe_revision      informe_revision?
+}
+
+model Registro_falla {
+  id              Int            @id @default(autoincrement())
+  id_revision     Int
+  categoria_falla String
+  nivel_gravedad  String
+  descripcion     String         @db.Text
+  revision        Revision       @relation(fields: [id_revision], references: [id])
+  imagenes        imagen_falla[]
+}
+
+model imagen_falla {
+  id                Int            @id @default(autoincrement())
+  id_registro_falla Int
+  url_imagen        String
+  falla             Registro_falla @relation(fields: [id_registro_falla], references: [id])
+}
+
+model informe_revision {
+  id                    Int      @id @default(autoincrement())
+  id_revision           Int      @unique
+  veredicto_final       String
+  observaciones_cliente String   @db.Text
+  fecha_emision         DateTime @default(now())
+  url_pdf               String?
+  revision              Revision @relation(fields: [id_revision], references: [id])
+}
