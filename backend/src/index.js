@@ -7,6 +7,7 @@ import propiedadRoutes from './routes/propiedad.routes.js';
 import fallaRoutes from './routes/falla.routes.js';
 import informeRoutes from './routes/informe.routes.js';
 import revisionRoutes from './routes/revision.routes.js';
+import imagenRoutes from './routes/imagen.routes.js';
 
 dotenv.config();
 
@@ -26,6 +27,8 @@ app.use('/api/propiedades', propiedadRoutes);
 app.use('/api/fallas', fallaRoutes);
 app.use('/api/revisiones', revisionRoutes);
 app.use('/api/informes', informeRoutes);
+app.use('/api/imagenes', imagenRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 
