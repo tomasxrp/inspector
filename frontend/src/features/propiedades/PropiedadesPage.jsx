@@ -52,11 +52,13 @@ export default function PropiedadesPage() {
         title="Propiedades"
         subtitle={`${propiedades.length} registros activos`}
         actions={
-          <Button onClick={() => navigate('/propiedades/nueva')}>+ Nueva propiedad</Button>
+          <Button size="sm" onClick={() => navigate('/propiedades/nueva')}>
+            + Nueva
+          </Button>
         }
       />
 
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         {loading && <LoadingSpinner text="Cargando propiedades..." />}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 px-4 py-3 text-red-400 text-sm font-mono">
@@ -76,63 +78,62 @@ export default function PropiedadesPage() {
         )}
 
         {!loading && propiedades.length > 0 && (
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             {propiedades.map((p) => (
               <div
                 key={p.id}
-                className="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition-colors p-5"
+                className="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition-colors p-4"
               >
-                <div className="flex items-start justify-between gap-4">
-                  {/* Info */}
+                {/* Fila superior: tipo + dirección */}
+                <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                       <span className="text-zinc-600 font-mono text-xs">#{p.id}</span>
                       <Badge variant={tipoBadge(p.tipo_propiedad)}>{p.tipo_propiedad}</Badge>
                     </div>
-                    <h3 className="text-white font-mono font-semibold text-sm">{p.direccion}</h3>
-                    <p className="text-zinc-500 font-mono text-xs mt-1">{p.comuna}</p>
+                    <h3 className="text-white font-mono font-semibold text-sm leading-snug">
+                      {p.direccion}
+                    </h3>
+                    <p className="text-zinc-500 font-mono text-xs mt-0.5">{p.comuna}</p>
                     {p.info_adicional && (
-                      <p className="text-zinc-600 font-mono text-xs mt-1 truncate">
+                      <p className="text-zinc-600 font-mono text-xs mt-1 line-clamp-2">
                         {p.info_adicional}
                       </p>
                     )}
                   </div>
+                </div>
 
-                  {/* Acciones */}
-                  <div className="flex flex-wrap gap-2 flex-shrink-0 justify-end">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => navigate(`/propiedades/${p.id}/editar`)}
-                    >
-                      Editar
-                    </Button>
-
-                    {/* NUEVO: Revisiones asociadas */}
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => navigate(`/propiedades/${p.id}/revisiones`)}
-                    >
-                      📋 Revisiones
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      onClick={() => navigate(`/revisiones/nueva?propiedadId=${p.id}`)}
-                    >
-                      + Revisión
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() => setDeleteTarget(p)}
-                    >
-                      ✕
-                    </Button>
-                  </div>
+                {/* Acciones en grid 2x2 en móvil */}
+                <div className="grid grid-cols-2 md:flex gap-2 pt-3 border-t border-zinc-800">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => navigate(`/propiedades/${p.id}/revisiones`)}
+                    className="col-span-2 md:col-span-1"
+                  >
+                    📋 Ver revisiones
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    onClick={() => navigate(`/revisiones/nueva?propiedadId=${p.id}`)}
+                  >
+                    + Revisión
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => navigate(`/propiedades/${p.id}/editar`)}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => setDeleteTarget(p)}
+                  >
+                    Eliminar
+                  </Button>
                 </div>
               </div>
             ))}
@@ -150,11 +151,11 @@ export default function PropiedadesPage() {
           <span className="text-amber-400">{deleteTarget?.direccion}</span>? Esta acción es
           irreversible.
         </p>
-        <div className="flex gap-3 justify-end">
-          <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
+        <div className="flex gap-3">
+          <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)}>
             Cancelar
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button variant="danger" className="flex-1" onClick={handleDelete} disabled={deleting}>
             {deleting ? 'Eliminando...' : 'Eliminar'}
           </Button>
         </div>

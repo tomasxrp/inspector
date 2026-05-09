@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader';
 import Button from '../../components/ui/Button';
-// eslint-disable-next-line 
-import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import Textarea from '../../components/ui/Textarea';
 import { crearRevision } from './revisionService';
@@ -62,8 +60,7 @@ export default function RevisionForm() {
         categoria_observacion: form.categoria_observacion,
         descripcion_general: form.descripcion_general || null,
       });
-      const nuevaRevision = res.data.revision;
-      navigate(`/revisiones/${nuevaRevision.id}`);
+      navigate(`/revisiones/${res.data.revision.id}`);
     } catch (err) {
       alert(err.response?.data?.error ?? 'Error al crear revisión');
     } finally {
@@ -78,11 +75,15 @@ export default function RevisionForm() {
       <PageHeader
         title="Nueva revisión"
         subtitle="Apertura de folio de inspección"
-        actions={<Button variant="ghost" onClick={() => navigate('/revisiones')}>← Volver</Button>}
+        actions={
+          <Button size="sm" variant="ghost" onClick={() => navigate('/revisiones')}>
+            ← Volver
+          </Button>
+        }
       />
 
-      <div className="p-8 max-w-2xl">
-        <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 p-6 space-y-5">
+      <div className="p-4 md:p-8 max-w-2xl">
+        <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 p-5 space-y-5">
           <Select
             label="Propiedad a inspeccionar"
             value={form.id_propiedad}
@@ -103,28 +104,36 @@ export default function RevisionForm() {
             onChange={(e) => setForm({ ...form, categoria_observacion: e.target.value })}
             error={errors.categoria_observacion}
           >
-            {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+            {CATEGORIAS.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
           </Select>
 
           <Textarea
             label="Descripción general (opcional)"
             value={form.descripcion_general}
             onChange={(e) => setForm({ ...form, descripcion_general: e.target.value })}
-            placeholder="Observaciones generales sobre el estado de la propiedad..."
-            rows={5}
+            placeholder="Observaciones generales..."
+            rows={4}
           />
 
           <div className="bg-amber-500/10 border border-amber-500/30 px-4 py-3">
             <p className="text-amber-400 text-xs font-mono">
-              Al crear la revisión, serás redirigido al folio donde podrás registrar las fallas encontradas.
+              Al crear la revisión serás redirigido al folio para registrar fallas.
             </p>
           </div>
 
           <div className="flex gap-3 pt-2 border-t border-zinc-800">
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Creando folio...' : 'Abrir folio de revisión →'}
+            <Button type="submit" disabled={loading} className="flex-1">
+              {loading ? 'Creando...' : 'Abrir folio →'}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => navigate('/revisiones')}>Cancelar</Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate('/revisiones')}
+            >
+              Cancelar
+            </Button>
           </div>
         </form>
       </div>

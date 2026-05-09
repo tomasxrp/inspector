@@ -1,5 +1,5 @@
 export default function Button({ children, variant = 'primary', size = 'md', className = '', ...props }) {
-  const base = 'inline-flex items-center gap-2 font-mono font-semibold tracking-wide uppercase transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:opacity-40 disabled:cursor-not-allowed';
+  const base = 'inline-flex items-center justify-center gap-2 font-mono font-semibold tracking-wide uppercase transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 touch-manipulation';
 
   const variants = {
     primary: 'bg-amber-500 text-zinc-900 hover:bg-amber-400 focus:ring-amber-500',
@@ -9,9 +9,9 @@ export default function Button({ children, variant = 'primary', size = 'md', cla
   };
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
+    sm: 'px-3 py-2 text-xs min-h-[36px]',
+    md: 'px-4 py-2.5 text-sm min-h-[42px]',
+    lg: 'px-6 py-3 text-base min-h-[50px]',
   };
 
   return (

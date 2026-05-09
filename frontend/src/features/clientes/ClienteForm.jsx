@@ -42,14 +42,17 @@ export default function ClienteForm() {
     setLoading(true);
     try {
       if (isEditing) {
-        await actualizarCliente(correo, { nombre: form.nombre, apellido: form.apellido, telefono: form.telefono });
+        await actualizarCliente(correo, {
+          nombre: form.nombre,
+          apellido: form.apellido,
+          telefono: form.telefono,
+        });
       } else {
         await crearCliente(form);
       }
       navigate('/clientes');
     } catch (err) {
-      const msg = err.response?.data?.error ?? 'Error al guardar';
-      alert(msg);
+      alert(err.response?.data?.error ?? 'Error al guardar');
     } finally {
       setLoading(false);
     }
@@ -65,19 +68,25 @@ export default function ClienteForm() {
         title={isEditing ? 'Editar cliente' : 'Nuevo cliente'}
         subtitle={isEditing ? `Editando: ${correo}` : 'Registro de nuevo propietario'}
         actions={
-          <Button variant="ghost" onClick={() => navigate('/clientes')}>← Volver</Button>
+          <Button size="sm" variant="ghost" onClick={() => navigate('/clientes')}>
+            ← Volver
+          </Button>
         }
       />
 
-      <div className="p-8 max-w-2xl">
-        <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 p-6 space-y-5">
-          <div className="grid grid-cols-2 gap-4">
+      <div className="p-4 md:p-8 max-w-2xl">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-zinc-900 border border-zinc-800 p-5 space-y-4"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Nombre"
               value={form.nombre}
               onChange={(e) => setForm({ ...form, nombre: e.target.value })}
               error={errors.nombre}
               placeholder="Juan"
+              autoComplete="given-name"
             />
             <Input
               label="Apellido"
@@ -85,11 +94,14 @@ export default function ClienteForm() {
               onChange={(e) => setForm({ ...form, apellido: e.target.value })}
               error={errors.apellido}
               placeholder="Pérez"
+              autoComplete="family-name"
             />
           </div>
           <Input
             label="Correo electrónico"
             type="email"
+            inputMode="email"
+            autoComplete="email"
             value={form.correo}
             onChange={(e) => setForm({ ...form, correo: e.target.value })}
             error={errors.correo}
@@ -98,6 +110,9 @@ export default function ClienteForm() {
           />
           <Input
             label="Teléfono"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={form.telefono}
             onChange={(e) => setForm({ ...form, telefono: e.target.value })}
             error={errors.telefono}
@@ -105,8 +120,8 @@ export default function ClienteForm() {
           />
 
           <div className="flex gap-3 pt-2 border-t border-zinc-800">
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Guardando...' : isEditing ? 'Actualizar cliente' : 'Crear cliente'}
+            <Button type="submit" disabled={loading} className="flex-1">
+              {loading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Crear cliente'}
             </Button>
             <Button type="button" variant="ghost" onClick={() => navigate('/clientes')}>
               Cancelar

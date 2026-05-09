@@ -22,7 +22,7 @@ export default function PropiedadRevisiones() {
   const [propiedad, setPropiedad] = useState(null);
   const [cliente, setCliente] = useState(null);
   const [revisiones, setRevisiones] = useState([]);
-  const [expanded, setExpanded] = useState(null); // id de la revision expandida
+  const [expanded, setExpanded] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -36,8 +36,6 @@ export default function PropiedadRevisiones() {
       const prop = propRes.data;
       setPropiedad(prop);
       setRevisiones(revRes.data.sort((a, b) => b.id - a.id));
-
-      // Cargar cliente de la propiedad
       if (prop.id_cliente) {
         try {
           const clientesRes = await getClientes();
@@ -52,11 +50,11 @@ export default function PropiedadRevisiones() {
     }
   }, [id]);
 
-  useEffect(() => { 
-    // eslint-disable-next-line 
-    fetchData(); }, [fetchData]);
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchData();
+  }, [fetchData]);
 
-  // Refresca solo una revisión concreta en el listado
   const refreshRevision = useCallback(async () => {
     try {
       const res = await getRevisionesPorPropiedad(id);
@@ -79,10 +77,6 @@ export default function PropiedadRevisiones() {
     }
   };
 
-  const toggleExpand = (revId) => {
-    setExpanded((prev) => (prev === revId ? null : revId));
-  };
-
   const handleFallaDeleted = (revisionId, fallaId) => {
     setRevisiones((prev) =>
       prev.map((r) =>
@@ -98,15 +92,15 @@ export default function PropiedadRevisiones() {
   return (
     <div>
       <PageHeader
-        title="Revisiones de propiedad"
+        title="Revisiones"
         subtitle={propiedad ? `${propiedad.direccion}, ${propiedad.comuna}` : `Propiedad #${id}`}
         actions={
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={() => navigate('/propiedades')}>
-              ← Propiedades
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" onClick={() => navigate('/propiedades')}>
+              ← Volver
             </Button>
-            <Button onClick={() => navigate(`/revisiones/nueva?propiedadId=${id}`)}>
-              + Nueva revisión
+            <Button size="sm" onClick={() => navigate(`/revisiones/nueva?propiedadId=${id}`)}>
+              + Nueva
             </Button>
           </div>
         }
@@ -114,18 +108,18 @@ export default function PropiedadRevisiones() {
 
       {/* Ficha de la propiedad */}
       {propiedad && (
-        <div className="mx-8 mt-6 bg-zinc-900 border border-zinc-800 p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="mx-4 md:mx-8 mt-4 bg-zinc-900 border border-zinc-800 p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
           <div>
             <p className="text-zinc-600 font-mono text-xs uppercase tracking-wide">Tipo</p>
             <p className="text-zinc-200 font-mono text-sm">{propiedad.tipo_propiedad}</p>
           </div>
           <div>
-            <p className="text-zinc-600 font-mono text-xs uppercase tracking-wide">Dirección</p>
-            <p className="text-zinc-200 font-mono text-sm">{propiedad.direccion}</p>
-          </div>
-          <div>
             <p className="text-zinc-600 font-mono text-xs uppercase tracking-wide">Comuna</p>
             <p className="text-zinc-200 font-mono text-sm">{propiedad.comuna}</p>
+          </div>
+          <div className="col-span-2 md:col-span-1">
+            <p className="text-zinc-600 font-mono text-xs uppercase tracking-wide">Dirección</p>
+            <p className="text-zinc-200 font-mono text-sm">{propiedad.direccion}</p>
           </div>
           <div>
             <p className="text-zinc-600 font-mono text-xs uppercase tracking-wide">Cliente</p>
@@ -134,7 +128,7 @@ export default function PropiedadRevisiones() {
                 <p className="text-zinc-200 font-mono text-sm">
                   {cliente.nombre} {cliente.apellido}
                 </p>
-                <p className="text-zinc-500 font-mono text-xs">{cliente.correo}</p>
+                <p className="text-zinc-500 font-mono text-xs truncate">{cliente.correo}</p>
               </div>
             ) : (
               <p className="text-zinc-500 font-mono text-xs">—</p>
@@ -143,7 +137,7 @@ export default function PropiedadRevisiones() {
         </div>
       )}
 
-      <div className="p-8 space-y-4">
+      <div className="p-4 md:p-8 space-y-3">
         {revisiones.length === 0 && (
           <div className="text-center py-16 border border-dashed border-zinc-800">
             <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest mb-4">
@@ -166,16 +160,18 @@ export default function PropiedadRevisiones() {
             <div
               key={r.id}
               className={`border transition-colors ${
-                isOpen ? 'border-amber-500/40 bg-zinc-900' : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700'
+                isOpen
+                  ? 'border-amber-500/40 bg-zinc-900'
+                  : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700'
               }`}
             >
-              {/* Cabecera de la revisión — siempre visible */}
-              <div className="p-4 flex items-start justify-between gap-4">
+              {/* Cabecera */}
+              <div className="p-4">
                 <div
-                  className="flex-1 min-w-0 cursor-pointer"
-                  onClick={() => toggleExpand(r.id)}
+                  className="cursor-pointer mb-3"
+                  onClick={() => setExpanded((p) => (p === r.id ? null : r.id))}
                 >
-                  <div className="flex items-center gap-3 mb-1 flex-wrap">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className="text-zinc-600 font-mono text-xs">
                       FOL-{String(r.id).padStart(4, '0')}
                     </span>
@@ -183,46 +179,33 @@ export default function PropiedadRevisiones() {
                     {r.informe_revision && <Badge variant="green">Con informe</Badge>}
                   </div>
 
-                  <div className="flex items-center gap-6 flex-wrap">
+                  <div className="flex items-center justify-between gap-3">
                     <p className="text-zinc-400 font-mono text-xs">
                       {formatDisplayDate(r.fecha_revision)}
                     </p>
-                    {/* Mini resumen fallas */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-xs font-mono font-bold">
                       {altaCount > 0 && (
-                        <span className="text-red-400 font-mono text-xs font-bold">
-                          {altaCount} alta{altaCount > 1 ? 's' : ''}
-                        </span>
+                        <span className="text-red-400">{altaCount}A</span>
                       )}
                       {mediaCount > 0 && (
-                        <span className="text-amber-400 font-mono text-xs font-bold">
-                          {mediaCount} media{mediaCount > 1 ? 's' : ''}
-                        </span>
+                        <span className="text-amber-400">{mediaCount}M</span>
                       )}
                       {bajaCount > 0 && (
-                        <span className="text-zinc-400 font-mono text-xs font-bold">
-                          {bajaCount} baja{bajaCount > 1 ? 's' : ''}
-                        </span>
+                        <span className="text-zinc-400">{bajaCount}B</span>
                       )}
                       {fallas.length === 0 && (
-                        <span className="text-zinc-600 font-mono text-xs">Sin fallas</span>
+                        <span className="text-zinc-600 font-normal">Sin fallas</span>
                       )}
                     </div>
                   </div>
-
-                  {r.descripcion_general && (
-                    <p className="text-zinc-600 font-mono text-xs mt-1 truncate">
-                      {r.descripcion_general}
-                    </p>
-                  )}
                 </div>
 
                 {/* Acciones */}
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => toggleExpand(r.id)}
+                    onClick={() => setExpanded((p) => (p === r.id ? null : r.id))}
                   >
                     {isOpen ? '▲ Cerrar' : '▼ Fallas'}
                   </Button>
@@ -243,25 +226,24 @@ export default function PropiedadRevisiones() {
                 </div>
               </div>
 
-              {/* Panel expandible de fallas */}
+              {/* Panel expandible */}
               {isOpen && (
                 <div className="border-t border-zinc-800 px-4 pb-4 pt-4 space-y-3">
-                  {/* Contador de fallas */}
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">
-                      Fallas registradas ({fallas.length})
+                      Fallas ({fallas.length})
                     </p>
-                    <div className="flex gap-3">
-                      {altaCount > 0 && <Badge variant="red">Alta: {altaCount}</Badge>}
-                      {mediaCount > 0 && <Badge variant="amber">Media: {mediaCount}</Badge>}
-                      {bajaCount > 0 && <Badge>Baja: {bajaCount}</Badge>}
+                    <div className="flex gap-2">
+                      {altaCount > 0 && <Badge variant="red">A: {altaCount}</Badge>}
+                      {mediaCount > 0 && <Badge variant="amber">M: {mediaCount}</Badge>}
+                      {bajaCount > 0 && <Badge>B: {bajaCount}</Badge>}
                     </div>
                   </div>
 
                   {fallas.length === 0 && (
                     <div className="text-center py-6 border border-dashed border-zinc-800">
                       <p className="text-zinc-600 font-mono text-xs uppercase tracking-widest">
-                        Sin fallas registradas aún
+                        Sin fallas aún
                       </p>
                     </div>
                   )}
@@ -275,7 +257,6 @@ export default function PropiedadRevisiones() {
                     />
                   ))}
 
-                  {/* Formulario para añadir nueva falla */}
                   <FallaForm idRevision={r.id} onCreated={refreshRevision} />
                 </div>
               )}
@@ -284,7 +265,6 @@ export default function PropiedadRevisiones() {
         })}
       </div>
 
-      {/* Modal confirmación eliminación */}
       <Modal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
@@ -294,18 +274,16 @@ export default function PropiedadRevisiones() {
           ¿Eliminar el folio{' '}
           <span className="text-amber-400">
             FOL-{String(deleteTarget?.id ?? 0).padStart(4, '0')}
-          </span>
-          ?
+          </span>?
         </p>
         <p className="text-zinc-500 text-xs font-mono mb-6">
-          Se eliminarán también todas las fallas e imágenes asociadas. Esta acción no se puede
-          deshacer.
+          Se eliminarán también todas las fallas e imágenes. Esta acción no se puede deshacer.
         </p>
-        <div className="flex gap-3 justify-end">
-          <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
+        <div className="flex gap-3">
+          <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)}>
             Cancelar
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button variant="danger" className="flex-1" onClick={handleDelete} disabled={deleting}>
             {deleting ? 'Eliminando...' : 'Eliminar folio'}
           </Button>
         </div>
