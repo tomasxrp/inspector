@@ -14,8 +14,8 @@ export const guardarImagenFalla = async (id_falla, url_imagen) => {
 
     return await prisma.imagen_falla.create({
         data: {
-            id_registro_falla,
-            url_imagen
+            id_registro_falla: id_falla,
+            url_imagen: url_imagen
         }
     });
 };
