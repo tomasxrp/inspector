@@ -11,9 +11,6 @@ router.post('/registro', usuarioController.registrarUsuario);
 router.get('/', usuarioController.obtenerUsuarios);
 
 // Ruta para login: POST http://localhost:3000/api/usuarios/login
-router.post('/login', verificarToken,usuarioController.login);
-
-// Ruta para registro: POST http://localhost:3000/api/usuarios/registro
-router.post('/registro', usuarioController.registrarUsuario);
+router.post('/login',usuarioController.login);
 
 export default router;

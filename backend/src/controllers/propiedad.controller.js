@@ -2,10 +2,10 @@ import * as propiedadService from '../services/propiedad.service.js';
 
 export const crearPropiedad = async (req, res) => {
     try {
-        const id_usuario = req.usuario.id; 
+        const id_usuario = req.usuario.id; // Viene del token JWT
         const { id_cliente, tipo_propiedad, direccion, comuna, info_adicional } = req.body;
 
-        if (!id_usuario || !id_cliente || !tipo_propiedad || !direccion || !comuna) {
+        if (!id_cliente || !tipo_propiedad || !direccion || !comuna) {
             return res.status(400).json({ error: 'Faltan campos obligatorios' });
         }
 
@@ -19,7 +19,6 @@ export const crearPropiedad = async (req, res) => {
         });
 
         res.status(201).json({ mensaje: 'Propiedad creada con éxito', propiedad: nuevaPropiedad });
-
 
     } catch (error) {
         if (error.message === 'USUARIO_NO_ENCONTRADO') {
@@ -58,9 +57,10 @@ export const obtenerPropiedadPorId = async (req, res) => {
 export const actualizarPropiedad = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        const { id_usuario, id_cliente, tipo_propiedad, direccion, comuna, info_adicional } = req.body;
+        const id_usuario = req.usuario.id; // Del token JWT
+        const { id_cliente, tipo_propiedad, direccion, comuna, info_adicional } = req.body;
 
-        if (!id_usuario || !id_cliente || !tipo_propiedad || !direccion || !comuna) {
+        if (!id_cliente || !tipo_propiedad || !direccion || !comuna) {
             return res.status(400).json({ error: 'Faltan campos obligatorios' });
         }
 

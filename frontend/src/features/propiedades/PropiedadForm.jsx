@@ -7,7 +7,6 @@ import Select from '../../components/ui/Select';
 import Textarea from '../../components/ui/Textarea';
 import { crearPropiedad, actualizarPropiedad, getPropiedadPorId } from './propiedadService';
 import { getClientes } from '../clientes/clienteService';
-import { useAuth } from '../../store/authStore';
 
 const TIPOS = ['Casa', 'Departamento', 'Comercial', 'Oficina', 'Bodega', 'Otro'];
 
@@ -15,7 +14,6 @@ export default function PropiedadForm() {
   const { id } = useParams();
   const isEditing = Boolean(id);
   const navigate = useNavigate();
-  const { auth } = useAuth();
 
   const [form, setForm] = useState({
     id_cliente: '',
@@ -32,7 +30,7 @@ export default function PropiedadForm() {
   useEffect(() => {
     const init = async () => {
       try {
-        const [clientesRes] = await Promise.all([getClientes()]);
+        const clientesRes = await getClientes();
         setClientes(clientesRes.data);
 
         if (isEditing) {
@@ -70,7 +68,7 @@ export default function PropiedadForm() {
     setLoading(true);
     try {
       const payload = {
-        id_usuario: parseInt(auth.usuario.id),
+        // id_usuario NO se envía: el backend lo lee del token JWT (req.usuario.id)
         id_cliente: parseInt(form.id_cliente),
         tipo_propiedad: form.tipo_propiedad,
         direccion: form.direccion,

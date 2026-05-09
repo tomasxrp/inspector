@@ -4,6 +4,7 @@ import AppLayout from '../components/layout/AppLayout';
 import LoginPage from '../features/auth/LoginPage';
 import PropiedadesPage from '../features/propiedades/PropiedadesPage';
 import PropiedadForm from '../features/propiedades/PropiedadForm';
+import PropiedadRevisiones from '../features/propiedades/PropiedadRevisiones';
 import ClientesPage from '../features/clientes/ClientesPage';
 import ClienteForm from '../features/clientes/ClienteForm';
 import RevisionesPage from '../features/revisiones/RevisionesPage';
@@ -25,6 +26,8 @@ export default function AppRouter() {
             <Route path="propiedades" element={<PropiedadesPage />} />
             <Route path="propiedades/nueva" element={<PropiedadForm />} />
             <Route path="propiedades/:id/editar" element={<PropiedadForm />} />
+            {/* NUEVO: revisiones por propiedad */}
+            <Route path="propiedades/:id/revisiones" element={<PropiedadRevisiones />} />
 
             {/* Clientes */}
             <Route path="clientes" element={<ClientesPage />} />
