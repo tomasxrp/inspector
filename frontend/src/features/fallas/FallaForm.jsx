@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import Button from '../../components/ui/Button';
-// eslint-disable-next-line
-import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import Textarea from '../../components/ui/Textarea';
 import { crearFalla } from './fallaService';
@@ -22,7 +20,11 @@ const GRAVEDADES = ['Baja', 'Media', 'Alta'];
 
 export default function FallaForm({ idRevision, onCreated }) {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ categoria_falla: CATEGORIAS[0], nivel_gravedad: 'Media', descripcion: '' });
+  const [form, setForm] = useState({
+    categoria_falla: CATEGORIAS[0],
+    nivel_gravedad: 'Media',
+    descripcion: '',
+  });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -59,7 +61,7 @@ export default function FallaForm({ idRevision, onCreated }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full border-2 border-dashed border-zinc-700 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all py-4 text-zinc-500 hover:text-amber-400 font-mono text-sm uppercase tracking-widest"
+        className="w-full border-2 border-dashed border-zinc-700 hover:border-amber-500/50 hover:bg-amber-500/5 active:bg-amber-500/10 transition-all py-5 text-zinc-500 hover:text-amber-400 font-mono text-sm uppercase tracking-widest touch-manipulation min-h-[60px]"
       >
         + Registrar nueva falla
       </button>
@@ -67,26 +69,41 @@ export default function FallaForm({ idRevision, onCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-zinc-900 border-2 border-amber-500/40 p-5 space-y-4">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-amber-400 font-mono text-xs font-bold uppercase tracking-widest">Nueva falla</p>
-        <button type="button" onClick={() => setOpen(false)} className="text-zinc-500 hover:text-white text-lg leading-none">&times;</button>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-zinc-900 border-2 border-amber-500/40 p-4 space-y-4"
+    >
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-amber-400 font-mono text-xs font-bold uppercase tracking-widest">
+          Nueva falla
+        </p>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="text-zinc-500 hover:text-white text-2xl leading-none w-9 h-9 flex items-center justify-center"
+        >
+          &times;
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Select
           label="Categoría"
           value={form.categoria_falla}
           onChange={(e) => setForm({ ...form, categoria_falla: e.target.value })}
         >
-          {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+          {CATEGORIAS.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
         </Select>
         <Select
           label="Gravedad"
           value={form.nivel_gravedad}
           onChange={(e) => setForm({ ...form, nivel_gravedad: e.target.value })}
         >
-          {GRAVEDADES.map((g) => <option key={g} value={g}>{g}</option>)}
+          {GRAVEDADES.map((g) => (
+            <option key={g} value={g}>{g}</option>
+          ))}
         </Select>
       </div>
 
@@ -95,15 +112,17 @@ export default function FallaForm({ idRevision, onCreated }) {
         value={form.descripcion}
         onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
         error={errors.descripcion}
-        placeholder="Describa la falla encontrada, ubicación exacta, extensión del daño..."
+        placeholder="Describa la falla: ubicación, extensión del daño..."
         rows={3}
       />
 
       <div className="flex gap-3">
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading} className="flex-1">
           {loading ? 'Registrando...' : 'Registrar falla'}
         </Button>
-        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
+        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+          Cancelar
+        </Button>
       </div>
     </form>
   );

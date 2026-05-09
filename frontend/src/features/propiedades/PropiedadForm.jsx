@@ -32,7 +32,6 @@ export default function PropiedadForm() {
       try {
         const clientesRes = await getClientes();
         setClientes(clientesRes.data);
-
         if (isEditing) {
           const res = await getPropiedadPorId(id);
           const p = res.data;
@@ -68,14 +67,12 @@ export default function PropiedadForm() {
     setLoading(true);
     try {
       const payload = {
-        // id_usuario NO se envía: el backend lo lee del token JWT (req.usuario.id)
         id_cliente: parseInt(form.id_cliente),
         tipo_propiedad: form.tipo_propiedad,
         direccion: form.direccion,
         comuna: form.comuna,
         info_adicional: form.info_adicional || null,
       };
-
       if (isEditing) {
         await actualizarPropiedad(parseInt(id), payload);
       } else {
@@ -96,11 +93,18 @@ export default function PropiedadForm() {
       <PageHeader
         title={isEditing ? 'Editar propiedad' : 'Nueva propiedad'}
         subtitle={isEditing ? `ID: ${id}` : 'Registro de inmueble'}
-        actions={<Button variant="ghost" onClick={() => navigate('/propiedades')}>← Volver</Button>}
+        actions={
+          <Button size="sm" variant="ghost" onClick={() => navigate('/propiedades')}>
+            ← Volver
+          </Button>
+        }
       />
 
-      <div className="p-8 max-w-2xl">
-        <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 p-6 space-y-5">
+      <div className="p-4 md:p-8 max-w-2xl">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-zinc-900 border border-zinc-800 p-5 space-y-4"
+        >
           <Select
             label="Cliente (propietario)"
             value={form.id_cliente}
@@ -120,7 +124,9 @@ export default function PropiedadForm() {
             value={form.tipo_propiedad}
             onChange={(e) => setForm({ ...form, tipo_propiedad: e.target.value })}
           >
-            {TIPOS.map((t) => <option key={t} value={t}>{t}</option>)}
+            {TIPOS.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
           </Select>
 
           <Input
@@ -129,6 +135,7 @@ export default function PropiedadForm() {
             onChange={(e) => setForm({ ...form, direccion: e.target.value })}
             error={errors.direccion}
             placeholder="Av. Principal 123"
+            autoComplete="street-address"
           />
           <Input
             label="Comuna"
@@ -145,10 +152,16 @@ export default function PropiedadForm() {
           />
 
           <div className="flex gap-3 pt-2 border-t border-zinc-800">
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="flex-1">
               {loading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Registrar propiedad'}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => navigate('/propiedades')}>Cancelar</Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate('/propiedades')}
+            >
+              Cancelar
+            </Button>
           </div>
         </form>
       </div>

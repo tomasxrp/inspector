@@ -32,6 +32,7 @@ export default function InformePage() {
   const [informe, setInforme] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState('datos'); // 'datos' | 'informe'
 
   const [form, setForm] = useState({
     veredicto_final: VEREDICTOS[0],
@@ -43,7 +44,6 @@ export default function InformePage() {
       try {
         const revRes = await getRevisionPorId(id);
         setRevision(revRes.data);
-
         try {
           const infRes = await getInformePorRevision(id);
           const inf = infRes.data;
@@ -53,7 +53,7 @@ export default function InformePage() {
             observaciones_cliente: inf.observaciones_cliente,
           });
         } catch {
-          // No informe yet — that's fine
+          // No informe aún
         }
       } catch {
         alert('Error al cargar datos');
@@ -100,41 +100,79 @@ export default function InformePage() {
     <div>
       <PageHeader
         title={`Informe — FOL-${String(revision.id).padStart(4, '0')}`}
-        subtitle={informe ? 'Informe emitido' : 'Borrador — aún no emitido'}
+        subtitle={informe ? 'Informe emitido' : 'Borrador'}
         actions={
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={() => navigate(`/revisiones/${id}`)}>← Volver al folio</Button>
-          </div>
+          <Button size="sm" variant="ghost" onClick={() => navigate(`/revisiones/${id}`)}>
+            ← Folio
+          </Button>
         }
       />
 
-      <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Resumen de la revisión */}
-        <div className="space-y-4">
-          <div className="bg-zinc-900 border border-zinc-800 p-5">
-            <p className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 mb-4">Datos de la inspección</p>
-            <dl className="space-y-2">
-              <div className="flex gap-3">
-                <dt className="text-zinc-600 font-mono text-xs w-32 flex-shrink-0 uppercase tracking-wide pt-0.5">Fecha</dt>
-                <dd className="text-zinc-200 font-mono text-sm">{formatDisplayDate(revision.fecha_revision)}</dd>
+      {/* Tabs para móvil */}
+      <div className="flex border-b border-zinc-800 md:hidden">
+        <button
+          className={`flex-1 py-3 text-xs font-mono font-bold uppercase tracking-widest transition-colors ${
+            activeTab === 'datos'
+              ? 'text-amber-400 border-b-2 border-amber-500'
+              : 'text-zinc-500'
+          }`}
+          onClick={() => setActiveTab('datos')}
+        >
+          Datos
+        </button>
+        <button
+          className={`flex-1 py-3 text-xs font-mono font-bold uppercase tracking-widest transition-colors ${
+            activeTab === 'informe'
+              ? 'text-amber-400 border-b-2 border-amber-500'
+              : 'text-zinc-500'
+          }`}
+          onClick={() => setActiveTab('informe')}
+        >
+          {informe ? 'Actualizar' : 'Emitir'} informe
+        </button>
+      </div>
+
+      <div className="p-4 md:p-8 md:grid md:grid-cols-2 md:gap-6">
+        {/* Panel izquierdo: Resumen */}
+        <div
+          className={`space-y-4 ${activeTab === 'informe' ? 'hidden md:block' : ''}`}
+        >
+          <div className="bg-zinc-900 border border-zinc-800 p-4">
+            <p className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 mb-3">
+              Datos de la inspección
+            </p>
+            <dl className="space-y-3">
+              <div>
+                <dt className="text-zinc-600 font-mono text-xs uppercase tracking-wide">Fecha</dt>
+                <dd className="text-zinc-200 font-mono text-sm">
+                  {formatDisplayDate(revision.fecha_revision)}
+                </dd>
               </div>
-              <div className="flex gap-3">
-                <dt className="text-zinc-600 font-mono text-xs w-32 flex-shrink-0 uppercase tracking-wide pt-0.5">Categoría</dt>
+              <div>
+                <dt className="text-zinc-600 font-mono text-xs uppercase tracking-wide">Categoría</dt>
                 <dd className="text-zinc-200 font-mono text-sm">{revision.categoria_observacion}</dd>
               </div>
               {revision.propiedad && (
                 <>
-                  <div className="flex gap-3">
-                    <dt className="text-zinc-600 font-mono text-xs w-32 flex-shrink-0 uppercase tracking-wide pt-0.5">Dirección</dt>
-                    <dd className="text-zinc-200 font-mono text-sm">{revision.propiedad.direccion}, {revision.propiedad.comuna}</dd>
+                  <div>
+                    <dt className="text-zinc-600 font-mono text-xs uppercase tracking-wide">
+                      Dirección
+                    </dt>
+                    <dd className="text-zinc-200 font-mono text-sm">
+                      {revision.propiedad.direccion}, {revision.propiedad.comuna}
+                    </dd>
                   </div>
                   {revision.propiedad.cliente && (
-                    <div className="flex gap-3">
-                      <dt className="text-zinc-600 font-mono text-xs w-32 flex-shrink-0 uppercase tracking-wide pt-0.5">Propietario</dt>
+                    <div>
+                      <dt className="text-zinc-600 font-mono text-xs uppercase tracking-wide">
+                        Propietario
+                      </dt>
                       <dd className="text-zinc-200 font-mono text-sm">
                         {revision.propiedad.cliente.nombre} {revision.propiedad.cliente.apellido}
                         <br />
-                        <span className="text-zinc-500 text-xs">{revision.propiedad.cliente.correo}</span>
+                        <span className="text-zinc-500 text-xs">
+                          {revision.propiedad.cliente.correo}
+                        </span>
                       </dd>
                     </div>
                   )}
@@ -143,9 +181,8 @@ export default function InformePage() {
             </dl>
           </div>
 
-          {/* Fallas summary */}
-          <div className="bg-zinc-900 border border-zinc-800 p-5">
-            <p className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 mb-4">
+          <div className="bg-zinc-900 border border-zinc-800 p-4">
+            <p className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 mb-3">
               Fallas registradas ({fallas.length})
             </p>
             {fallas.length === 0 && (
@@ -153,14 +190,19 @@ export default function InformePage() {
             )}
             <div className="space-y-2">
               {fallas.map((f) => (
-                <div key={f.id} className="flex items-start gap-3 py-2 border-b border-zinc-800 last:border-0">
+                <div
+                  key={f.id}
+                  className="flex items-start gap-3 py-2 border-b border-zinc-800 last:border-0"
+                >
                   <Badge variant={gravedadVariant(f.nivel_gravedad)}>{f.nivel_gravedad}</Badge>
-                  <div className="flex-1">
-                    <p className="text-zinc-300 font-mono text-xs">{f.descripcion}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-zinc-300 font-mono text-xs leading-relaxed">{f.descripcion}</p>
                     <p className="text-zinc-600 font-mono text-xs">{f.categoria_falla}</p>
                   </div>
                   {f.imagenes?.length > 0 && (
-                    <span className="text-zinc-600 font-mono text-xs">{f.imagenes.length} foto(s)</span>
+                    <span className="text-zinc-600 font-mono text-xs flex-shrink-0">
+                      {f.imagenes.length} 📷
+                    </span>
                   )}
                 </div>
               ))}
@@ -168,8 +210,8 @@ export default function InformePage() {
           </div>
         </div>
 
-        {/* Right: Informe form */}
-        <div>
+        {/* Panel derecho: Formulario informe */}
+        <div className={activeTab === 'datos' ? 'hidden md:block' : ''}>
           <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 p-5 space-y-5">
             <p className="text-xs font-mono font-bold uppercase tracking-widest text-amber-400 pb-3 border-b border-zinc-800">
               {informe ? 'Actualizar informe' : 'Emitir informe oficial'}
@@ -180,30 +222,36 @@ export default function InformePage() {
               value={form.veredicto_final}
               onChange={(e) => setForm({ ...form, veredicto_final: e.target.value })}
             >
-              {VEREDICTOS.map((v) => <option key={v} value={v}>{v}</option>)}
+              {VEREDICTOS.map((v) => (
+                <option key={v} value={v}>{v}</option>
+              ))}
             </Select>
 
             <Textarea
               label="Observaciones para el cliente"
               value={form.observaciones_cliente}
               onChange={(e) => setForm({ ...form, observaciones_cliente: e.target.value })}
-              placeholder="Detalle las observaciones, recomendaciones y plazos para reparaciones..."
+              placeholder="Detalle las observaciones, recomendaciones y plazos..."
               rows={8}
             />
 
             {informe && (
               <div className="bg-green-500/10 border border-green-500/30 px-3 py-2">
                 <p className="text-green-400 text-xs font-mono">
-                  ✓ Informe emitido el {formatDisplayDate(informe.fecha_emision)}
+                  ✓ Emitido el {formatDisplayDate(informe.fecha_emision)}
                 </p>
               </div>
             )}
 
             <div className="flex gap-3 pt-2 border-t border-zinc-800">
-              <Button type="submit" disabled={saving}>
-                {saving ? 'Guardando...' : informe ? 'Actualizar informe' : 'Emitir informe'}
+              <Button type="submit" disabled={saving} className="flex-1">
+                {saving ? 'Guardando...' : informe ? 'Actualizar' : 'Emitir informe'}
               </Button>
-              <Button type="button" variant="ghost" onClick={() => navigate(`/revisiones/${id}`)}>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => navigate(`/revisiones/${id}`)}
+              >
                 Cancelar
               </Button>
             </div>
