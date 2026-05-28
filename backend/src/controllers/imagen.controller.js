@@ -4,43 +4,75 @@ import * as imagenService from '../services/imagen.service.js';
 export const subirImagenFalla = async (req, res) => {
     try {
         const id_falla = parseInt(req.params.id_falla, 10);
-        const archivo = req.file; // Multer nos deja el archivo aquí
+        const archivo  = req.file;
 
         if (!archivo) {
             return res.status(400).json({ error: 'No se proporcionó ninguna imagen' });
         }
 
-        // 1. Crear un nombre único para la imagen (ej: 123-169876543.jpg)
-        const nombreArchivo = `${id_falla}-${Date.now()}-${archivo.originalname.replace(/\s+/g, '_')}`;
+        // ── Diagnostics (remove once working) ──────────────────
+        console.log('[imagen] buffer size   :', archivo.buffer?.length ?? 'undefined');
+        console.log('[imagen] mimetype      :', archivo.mimetype);
+        console.log('[imagen] SUPABASE_URL  :', process.env.SUPABASE_PROJECT_URL);
+        // ────────────────────────────────────────────────────────
 
-        // 2. Subir el archivo al bucket de Supabase
+        if (!archivo.buffer || archivo.buffer.length === 0) {
+            return res.status(400).json({ error: 'El archivo recibido está vacío' });
+        }
+
+        // Map MIME type → safe extension (never trust the original filename)
+        const mimeToExt = {
+            'image/jpeg':    'jpg',
+            'image/jpg':     'jpg',
+            'image/png':     'png',
+            'image/webp':    'webp',
+            'image/gif':     'gif',
+            'image/heic':    'heic',
+            'image/heif':    'heif',
+        };
+        const ext          = mimeToExt[archivo.mimetype] ?? 'jpg';
+        const nombreArchivo = `falla-${id_falla}-${Date.now()}.${ext}`;
+
+        console.log('[imagen] uploading as  :', nombreArchivo);
+
         const { data, error } = await supabase.storage
             .from('imagenes_fallas')
             .upload(nombreArchivo, archivo.buffer, {
-                contentType: archivo.mimetype
+                contentType: archivo.mimetype,
+                upsert: false,
             });
 
         if (error) {
-            throw new Error(`Error de Supabase: ${error.message}`);
+            console.error('[imagen] Supabase error:', error);
+            return res.status(500).json({
+                error:  'Error al subir imagen a almacenamiento',
+                detalle: error.message,
+                // Extra context to help diagnose
+                hint: 'Verifique que el bucket "imagenes_fallas" exista en Supabase y que las políticas RLS permitan INSERT.',
+            });
         }
 
-        // 3. Obtener la URL pública de la imagen recién subida
-        const { data: urlPublica } = supabase.storage
+        console.log('[imagen] upload ok, path:', data?.path);
+
+        const { data: urlData } = supabase.storage
             .from('imagenes_fallas')
             .getPublicUrl(nombreArchivo);
 
-        // 4. Guardar esa URL en nuestra base de datos con Prisma
-        const nuevaImagenDb = await imagenService.guardarImagenFalla(id_falla, urlPublica.publicUrl);
+        const nuevaImagenDb = await imagenService.guardarImagenFalla(id_falla, urlData.publicUrl);
 
-        res.status(201).json({
+        return res.status(201).json({
             mensaje: 'Imagen subida y registrada con éxito',
-            imagen: nuevaImagenDb
+            imagen:  nuevaImagenDb,
         });
 
     } catch (error) {
         if (error.message === 'FALLA_NO_ENCONTRADA') {
             return res.status(404).json({ error: 'La falla asociada no existe' });
         }
-        res.status(500).json({ error: 'Error interno del servidor', detalle: error.message });
+        console.error('[imagen] unexpected error:', error);
+        return res.status(500).json({
+            error:   'Error interno del servidor',
+            detalle: error.message,
+        });
     }
 };

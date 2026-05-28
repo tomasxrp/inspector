@@ -3,29 +3,25 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const crearCliente = async (datosCliente) => {
-
     const clienteEncontrado = await prisma.cliente.findUnique({
         where: { correo: datosCliente.correo }
     });
 
-    if(clienteEncontrado){
+    if (clienteEncontrado) {
         throw new Error('CORREO_EXISTENTE');
     }
 
     const nuevoCliente = await prisma.cliente.create({
-        data: {
-            ...datosCliente
-        }
+        data: { ...datosCliente }
     });
 
     return nuevoCliente;
-}
-
+};
 
 export const obtenerClientes = async () => {
     const clientes = await prisma.cliente.findMany();
     return clientes;
-}
+};
 
 export const obtenerClientePorCorreo = async (correo) => {
     const cliente = await prisma.cliente.findUnique({
@@ -37,8 +33,7 @@ export const obtenerClientePorCorreo = async (correo) => {
     }
 
     return cliente;
-}
-
+};
 
 export const actualizarCliente = async (correo, datosActualizados) => {
     const clienteExistente = await prisma.cliente.findUnique({
@@ -51,24 +46,25 @@ export const actualizarCliente = async (correo, datosActualizados) => {
 
     const clienteActualizado = await prisma.cliente.update({
         where: { correo },
-        data: {
-            ...datosActualizados
-        }
+        data: { ...datosActualizados }
     });
 
     return clienteActualizado;
-}
+};
 
 export const eliminarCliente = async (correo) => {
     const clienteExistente = await prisma.cliente.findUnique({
-        where: { correo }
+        where: { correo },
+        include: { propiedades: true }
     });
 
     if (!clienteExistente) {
         throw new Error('CLIENTE_NO_ENCONTRADO');
     }
 
-    await prisma.cliente.delete({
-        where: { correo }
-    });
-}
+    if (clienteExistente.propiedades.length > 0) {
+        throw new Error('CLIENTE_TIENE_PROPIEDADES');
+    }
+
+    await prisma.cliente.delete({ where: { correo } });
+};

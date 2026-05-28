@@ -14,6 +14,7 @@ const gravedadVariant = (g) => {
 export default function FallaCard({ falla, onDeleted, onImageUploaded }) {
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null); // { savedPercent, compressedSize } | null
+  const [error, setError] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const fileRef = useRef();
@@ -42,6 +43,7 @@ export default function FallaCard({ falla, onDeleted, onImageUploaded }) {
 
     setUploading(true);
     setUploadStatus(null);
+    setError(null);
 
     try {
       // 1. Comprimir antes de subir
@@ -57,8 +59,14 @@ export default function FallaCard({ falla, onDeleted, onImageUploaded }) {
       }
 
       onImageUploaded();
-    } catch {
-      alert('Error al subir imagen');
+    } catch (err) {
+      console.error('Error al subir imagen:', err);
+      const serverError = err.response?.data?.error;
+      const serverDetail = err.response?.data?.detalle;
+      const message = serverError
+        ? (serverDetail ? `${serverError}: ${serverDetail}` : serverError)
+        : (err.message || 'Error desconocido al subir la imagen');
+      setError(message);
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -90,6 +98,25 @@ export default function FallaCard({ falla, onDeleted, onImageUploaded }) {
             Imagen optimizada — {formatBytes(uploadStatus.compressedSize)} 
             {' '}(-{uploadStatus.savedPercent}% de tamaño)
           </p>
+        </div>
+      )}
+
+      {/* Feedback de error */}
+      {error && (
+        <div className="mb-3 bg-red-500/10 border border-red-500/30 px-3 py-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-red-400 text-xs">✗</span>
+            <p className="text-red-400 font-mono text-xs">
+              {error}
+            </p>
+          </div>
+          <button 
+            type="button"
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-300 text-xs font-mono px-1 font-bold cursor-pointer"
+          >
+            ×
+          </button>
         </div>
       )}
 
