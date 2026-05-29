@@ -4,24 +4,14 @@ import Select from '../../components/ui/Select';
 import Textarea from '../../components/ui/Textarea';
 import { crearFalla } from './fallaService';
 
-const CATEGORIAS = [
-  'Fisuras y grietas',
-  'Humedad y filtraciones',
-  'Instalación eléctrica',
-  'Instalación sanitaria',
-  'Terminaciones',
-  'Estructura',
-  'Cubiertas y techumbres',
-  'Ventanas y puertas',
-  'Otro',
-];
+import { CATEGORIAS_FALLAS } from './fallaConstants';
 
 const GRAVEDADES = ['Baja', 'Media', 'Alta'];
 
 export default function FallaForm({ idRevision, onCreated }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
-    categoria_falla: CATEGORIAS[0],
+    categoria_falla: CATEGORIAS_FALLAS[0].opciones[0],
     nivel_gravedad: 'Media',
     descripcion: '',
   });
@@ -46,7 +36,7 @@ export default function FallaForm({ idRevision, onCreated }) {
         nivel_gravedad: form.nivel_gravedad,
         descripcion: form.descripcion,
       });
-      setForm({ categoria_falla: CATEGORIAS[0], nivel_gravedad: 'Media', descripcion: '' });
+      setForm({ categoria_falla: CATEGORIAS_FALLAS[0].opciones[0], nivel_gravedad: 'Media', descripcion: '' });
       setErrors({});
       setOpen(false);
       onCreated();
@@ -92,8 +82,12 @@ export default function FallaForm({ idRevision, onCreated }) {
           value={form.categoria_falla}
           onChange={(e) => setForm({ ...form, categoria_falla: e.target.value })}
         >
-          {CATEGORIAS.map((c) => (
-            <option key={c} value={c}>{c}</option>
+          {CATEGORIAS_FALLAS.map((c) => (
+            <optgroup key={c.grupo} label={c.grupo}>
+              {c.opciones.map((op) => (
+                <option key={op} value={op}>{op}</option>
+              ))}
+            </optgroup>
           ))}
         </Select>
         <Select

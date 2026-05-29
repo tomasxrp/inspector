@@ -11,6 +11,7 @@ import RevisionesPage from '../features/revisiones/RevisionesPage';
 import RevisionForm from '../features/revisiones/RevisionForm';
 import RevisionDetalle from '../features/revisiones/RevisionDetalle';
 import InformePage from '../features/informes/InformePage';
+import DashboardPage from '../features/dashboard/DashboardPage';
 
 export default function AppRouter() {
   return (
@@ -20,7 +21,10 @@ export default function AppRouter() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index element={<Navigate to="/propiedades" replace />} />
+            <Route index element={<Navigate to="/dashboard" replace />} />
+
+            {/* Dashboard */}
+            <Route path="dashboard" element={<DashboardPage />} />
 
             {/* Propiedades */}
             <Route path="propiedades" element={<PropiedadesPage />} />

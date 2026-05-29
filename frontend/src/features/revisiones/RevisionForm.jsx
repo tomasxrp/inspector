@@ -9,14 +9,10 @@ import { getPropiedades } from '../propiedades/propiedadService';
 import { useAuth } from '../../store/authStore';
 
 const CATEGORIAS = [
-  'Inspección general',
-  'Revisión estructural',
-  'Revisión eléctrica',
-  'Revisión sanitaria',
-  'Revisión de terminaciones',
-  'Revisión de humedad',
-  'Pre-entrega',
-  'Post-venta',
+  'Inspección Pre-compra (Propiedades Usadas)',
+  'Inspección de Recepción o Entrega (Propiedades Nuevas)',
+  'Inspección de Pre-entrega',
+  'Inspección de Garantía (Posventa)',
 ];
 
 export default function RevisionForm() {

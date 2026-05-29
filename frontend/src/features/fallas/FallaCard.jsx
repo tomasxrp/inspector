@@ -6,6 +6,7 @@ import Toast from '../../components/ui/Toast';
 import { eliminarFalla } from './fallaService';
 import { subirImagenFalla, eliminarImagenFalla as borrarImagenFallaService } from './imagenService';
 import { compressImage, formatBytes } from '../../hooks/useImageCompressor';
+import { getFallaColor } from './fallaConstants';
 
 const gravedadVariant = (g) => {
   if (g === 'Alta') return 'red';
@@ -107,7 +108,7 @@ export default function FallaCard({ falla, onDeleted, onImageUploaded }) {
             <Badge variant={gravedadVariant(falla.nivel_gravedad)}>
               {falla.nivel_gravedad}
             </Badge>
-            <Badge>{falla.categoria_falla}</Badge>
+            <Badge variant={getFallaColor(falla.categoria_falla)}>{falla.categoria_falla}</Badge>
           </div>
           <p className="text-zinc-200 font-mono text-sm leading-relaxed">
             {falla.descripcion}

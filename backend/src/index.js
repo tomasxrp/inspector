@@ -8,6 +8,7 @@ import fallaRoutes from './routes/falla.routes.js';
 import informeRoutes from './routes/informe.routes.js';
 import revisionRoutes from './routes/revision.routes.js';
 import imagenRoutes from './routes/imagen.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/api/fallas', fallaRoutes);
 app.use('/api/revisiones', revisionRoutes);
 app.use('/api/informes', informeRoutes);
 app.use('/api/imagenes', imagenRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 
 const PORT = process.env.PORT || 3000;
