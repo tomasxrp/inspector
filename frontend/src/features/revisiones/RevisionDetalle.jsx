@@ -6,6 +6,7 @@ import Badge from '../../components/ui/Badge';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import FallaCard from '../fallas/FallaCard';
 import FallaForm from '../fallas/FallaForm';
+import RevisionChecklist from './RevisionChecklist';
 import { getRevisionPorId } from './revisionService';
 import { formatDisplayDate } from '../../utils/dateUtils';
 
@@ -158,6 +159,9 @@ export default function RevisionDetalle() {
             </Button>
           </div>
         )}
+
+        {/* Checklist */}
+        <RevisionChecklist revisionId={id} />
 
         {/* Fallas */}
         <div>
