@@ -39,9 +39,7 @@ export const actualizarFalla = async (id, datosActualizados) => {
     });
 };
 
-/**
- * Cascade-delete: first remove images, then the fault record.
- */
+
 export const eliminarFalla = async (id) => {
     const fallaExistente = await prisma.registro_falla.findUnique({
         where: { id },

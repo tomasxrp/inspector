@@ -76,3 +76,43 @@ export const subirImagenFalla = async (req, res) => {
         });
     }
 };
+
+export const eliminarImagenFalla = async (req, res) => {
+    try {
+        const id_imagen = parseInt(req.params.id, 10);
+        const imagenDb = await imagenService.obtenerImagenPorId(id_imagen);
+
+        if (!imagenDb) {
+            return res.status(404).json({ error: 'Imagen no encontrada' });
+        }
+
+        // Extraer nombre del archivo desde la URL (asumiendo formato estándar de Supabase)
+        const urlParts = imagenDb.url_imagen.split('/');
+        const nombreArchivo = urlParts[urlParts.length - 1];
+
+        // Eliminar de Supabase
+        const { error } = await supabase.storage
+            .from('imagenes_fallas')
+            .remove([nombreArchivo]);
+
+        if (error) {
+            console.error('[imagen] Supabase error (delete):', error);
+            return res.status(500).json({
+                error: 'Error al eliminar imagen de almacenamiento',
+                detalle: error.message,
+            });
+        }
+
+        // Eliminar de la base de datos
+        await imagenService.eliminarImagenFalla(id_imagen);
+
+        return res.status(200).json({ mensaje: 'Imagen eliminada con éxito' });
+
+    } catch (error) {
+        console.error('[imagen] unexpected error (delete):', error);
+        return res.status(500).json({
+            error: 'Error interno del servidor al eliminar',
+            detalle: error.message,
+        });
+    }
+};

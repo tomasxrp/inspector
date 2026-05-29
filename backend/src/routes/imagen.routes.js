@@ -12,4 +12,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // 'imagen' es el nombre del campo que el Frontend debe usar al enviar el archivo
 router.post('/falla/:id_falla', verificarToken, upload.single('imagen'), imagenController.subirImagenFalla);
 
+// Ruta para eliminar imagen
+router.delete('/:id', verificarToken, imagenController.eliminarImagenFalla);
+
 export default router;

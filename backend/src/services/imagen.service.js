@@ -19,3 +19,15 @@ export const guardarImagenFalla = async (id_falla, url_imagen) => {
         }
     });
 };
+
+export const obtenerImagenPorId = async (id) => {
+    return await prisma.imagen_falla.findUnique({
+        where: { id: parseInt(id, 10) }
+    });
+};
+
+export const eliminarImagenFalla = async (id) => {
+    return await prisma.imagen_falla.delete({
+        where: { id: parseInt(id, 10) }
+    });
+};

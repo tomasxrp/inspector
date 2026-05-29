@@ -5,8 +5,6 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Modal from '../../components/ui/Modal';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
-import FallaCard from '../fallas/FallaCard';
-import FallaForm from '../fallas/FallaForm';
 import { getPropiedadPorId } from './propiedadService';
 import { getRevisionesPorPropiedad, eliminarRevision } from '../revisiones/revisionService';
 import { getClientes } from '../clientes/clienteService';
@@ -22,7 +20,6 @@ export default function PropiedadRevisiones() {
   const [propiedad, setPropiedad] = useState(null);
   const [cliente, setCliente] = useState(null);
   const [revisiones, setRevisiones] = useState([]);
-  const [expanded, setExpanded] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -55,36 +52,18 @@ export default function PropiedadRevisiones() {
     fetchData();
   }, [fetchData]);
 
-  const refreshRevision = useCallback(async () => {
-    try {
-      const res = await getRevisionesPorPropiedad(id);
-      setRevisiones(res.data.sort((a, b) => b.id - a.id));
-    } catch { /* ok */ }
-  }, [id]);
-
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
       await eliminarRevision(deleteTarget.id);
       setRevisiones((prev) => prev.filter((r) => r.id !== deleteTarget.id));
-      if (expanded === deleteTarget.id) setExpanded(null);
       setDeleteTarget(null);
     } catch {
       alert('No se pudo eliminar la revisión.');
     } finally {
       setDeleting(false);
     }
-  };
-
-  const handleFallaDeleted = (revisionId, fallaId) => {
-    setRevisiones((prev) =>
-      prev.map((r) =>
-        r.id === revisionId
-          ? { ...r, fallas: r.fallas.filter((f) => f.id !== fallaId) }
-          : r
-      )
-    );
   };
 
   if (loading) return <div className="p-8"><LoadingSpinner text="Cargando revisiones..." /></div>;
@@ -150,7 +129,6 @@ export default function PropiedadRevisiones() {
         )}
 
         {revisiones.map((r) => {
-          const isOpen = expanded === r.id;
           const fallas = r.fallas ?? [];
           const altaCount = gravedadCount(fallas, 'Alta');
           const mediaCount = gravedadCount(fallas, 'Media');
@@ -159,18 +137,11 @@ export default function PropiedadRevisiones() {
           return (
             <div
               key={r.id}
-              className={`border transition-colors ${
-                isOpen
-                  ? 'border-amber-500/40 bg-zinc-900'
-                  : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700'
-              }`}
+              className="border border-zinc-800 bg-zinc-900 hover:border-zinc-700 transition-colors"
             >
               {/* Cabecera */}
               <div className="p-4">
-                <div
-                  className="cursor-pointer mb-3"
-                  onClick={() => setExpanded((p) => (p === r.id ? null : r.id))}
-                >
+                <div className="mb-3">
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className="text-zinc-600 font-mono text-xs">
                       FOL-{String(r.id).padStart(4, '0')}
@@ -204,10 +175,10 @@ export default function PropiedadRevisiones() {
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     size="sm"
-                    variant="ghost"
-                    onClick={() => setExpanded((p) => (p === r.id ? null : r.id))}
+                    variant="primary"
+                    onClick={() => navigate(`/revisiones/${r.id}`)}
                   >
-                    {isOpen ? '▲ Cerrar' : '▼ Fallas'}
+                    Ir a fallas
                   </Button>
                   <Button
                     size="sm"
@@ -225,41 +196,6 @@ export default function PropiedadRevisiones() {
                   </Button>
                 </div>
               </div>
-
-              {/* Panel expandible */}
-              {isOpen && (
-                <div className="border-t border-zinc-800 px-4 pb-4 pt-4 space-y-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">
-                      Fallas ({fallas.length})
-                    </p>
-                    <div className="flex gap-2">
-                      {altaCount > 0 && <Badge variant="red">A: {altaCount}</Badge>}
-                      {mediaCount > 0 && <Badge variant="amber">M: {mediaCount}</Badge>}
-                      {bajaCount > 0 && <Badge>B: {bajaCount}</Badge>}
-                    </div>
-                  </div>
-
-                  {fallas.length === 0 && (
-                    <div className="text-center py-6 border border-dashed border-zinc-800">
-                      <p className="text-zinc-600 font-mono text-xs uppercase tracking-widest">
-                        Sin fallas aún
-                      </p>
-                    </div>
-                  )}
-
-                  {fallas.map((falla) => (
-                    <FallaCard
-                      key={falla.id}
-                      falla={falla}
-                      onDeleted={(fallaId) => handleFallaDeleted(r.id, fallaId)}
-                      onImageUploaded={refreshRevision}
-                    />
-                  ))}
-
-                  <FallaForm idRevision={r.id} onCreated={refreshRevision} />
-                </div>
-              )}
             </div>
           );
         })}
