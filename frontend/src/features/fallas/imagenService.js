@@ -7,3 +7,7 @@ export const subirImagenFalla = (id_falla, file) => {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 };
+
+export const eliminarImagenFalla = (id_imagen) => {
+  return api.delete(`/imagenes/${id_imagen}`);
+};
