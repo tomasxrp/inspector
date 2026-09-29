@@ -2,26 +2,38 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const obtenerEstadisticas = async () => {
-    const totalPropiedades = await prisma.propiedad.count();
-    const totalRevisiones = await prisma.revision.count();
+export const obtenerEstadisticas = async (id_usuario) => {
+    const totalPropiedades = await prisma.propiedad.count({
+        where: { id_usuario }
+    });
+    const totalRevisiones = await prisma.revision.count({
+        where: { id_usuario }
+    });
 
     const fallasPorGravedadData = await prisma.registro_falla.groupBy({
         by: ['nivel_gravedad'],
+        where: {
+            revision: { id_usuario }
+        },
         _count: { id: true }
     });
 
     const fallasPorCategoriaData = await prisma.registro_falla.groupBy({
         by: ['categoria_falla'],
+        where: {
+            revision: { id_usuario }
+        },
         _count: { id: true }
     });
 
     const propiedadesPorTipoData = await prisma.propiedad.groupBy({
         by: ['tipo_propiedad'],
+        where: { id_usuario },
         _count: { id: true }
     });
 
     const ultimasRevisiones = await prisma.revision.findMany({
+        where: { id_usuario },
         take: 5,
         orderBy: { fecha_revision: 'desc' },
         include: {
@@ -60,3 +72,4 @@ export const obtenerEstadisticas = async () => {
         ultimasRevisiones
     };
 };
+

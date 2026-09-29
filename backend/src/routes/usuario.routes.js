@@ -4,13 +4,13 @@ import { verificarToken } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// Ruta para crear un usuario: POST http://localhost:3000/api/usuarios
+// Registro de usuario: POST /api/usuarios/registro
 router.post('/registro', usuarioController.registrarUsuario);
 
-// Ruta para obtener usuarios: GET http://localhost:3000/api/usuarios
-router.get('/', usuarioController.obtenerUsuarios);
+// Login de usuario: POST /api/usuarios/login
+router.post('/login', usuarioController.login);
 
-// Ruta para login: POST http://localhost:3000/api/usuarios/login
-router.post('/login',usuarioController.login);
+// Perfil del usuario autenticado: GET /api/usuarios/perfil
+router.get('/perfil', verificarToken, usuarioController.obtenerPerfil);
 
-export default router;
+export default router;

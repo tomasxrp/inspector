@@ -2,13 +2,17 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const crearInforme = async (id_revision, datosInforme) => {
+export const crearInforme = async (id_revision, id_usuario, datosInforme) => {
     const revisionExistente = await prisma.revision.findUnique({
         where: { id: id_revision }
     });
 
     if (!revisionExistente) {
         throw new Error('REVISION_NO_ENCONTRADA');
+    }
+
+    if (revisionExistente.id_usuario !== id_usuario) {
+        throw new Error('NO_AUTORIZADO');
     }
 
     const informeExistente = await prisma.informe_revision.findUnique({
@@ -29,8 +33,7 @@ export const crearInforme = async (id_revision, datosInforme) => {
     });
 };
 
-export const obtenerInformeCompleto = async (id_revision) => {
-
+export const obtenerInformeCompleto = async (id_revision, id_usuario) => {
     const informe = await prisma.informe_revision.findUnique({
         where: { id_revision },
         include: {
@@ -51,20 +54,29 @@ export const obtenerInformeCompleto = async (id_revision) => {
         throw new Error('INFORME_NO_ENCONTRADO');
     }
 
+    if (informe.revision.id_usuario !== id_usuario) {
+        throw new Error('NO_AUTORIZADO');
+    }
+
     return informe;
 };
 
-export const actualizarInforme = async (id_revision, datosActualizados) => {
+export const actualizarInforme = async (id_revision, id_usuario, datosActualizados) => {
     const informeExistente = await prisma.informe_revision.findUnique({
-        where: { id_revision }
+        where: { id_revision },
+        include: { revision: true }
     });
 
     if (!informeExistente) {
         throw new Error('INFORME_NO_ENCONTRADO');
     }
 
+    if (informeExistente.revision.id_usuario !== id_usuario) {
+        throw new Error('NO_AUTORIZADO');
+    }
+
     return await prisma.informe_revision.update({
         where: { id_revision },
         data: datosActualizados
     });
-};
+};
