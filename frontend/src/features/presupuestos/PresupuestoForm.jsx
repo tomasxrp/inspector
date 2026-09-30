@@ -104,6 +104,21 @@ export default function PresupuestoForm() {
   // Manejo de Plantillas
   const handleCargarPlantilla = (plantillaId) => {
     if (!plantillaId) return;
+    
+    if (plantillaId === 'BLANCO') {
+      if (items.length > 0 && !confirm('¿Desea borrar todo el itemizado actual para empezar desde cero?')) {
+        return;
+      }
+      setPorcentajeGG(10);
+      setPorcentajeUtil(10);
+      setItems([]);
+      setNombreProyecto('');
+      setMandante('');
+      setContratista('');
+      setUbicacion('');
+      return;
+    }
+
     const t = plantillas.find((p) => p.id === parseInt(plantillaId, 10)) || PLANTILLAS_PREDEFINIDAS.find(p => p.id === plantillaId);
     if (!t) return;
     if (items.length > 0 && !confirm('¿Desea reemplazar el itemizado actual con la plantilla seleccionada?')) {
@@ -350,11 +365,16 @@ export default function PresupuestoForm() {
               className="bg-zinc-800 border border-zinc-700 text-zinc-200 px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-amber-500 rounded-none w-64"
             >
               <option value="">-- Seleccionar Plantilla --</option>
-              {plantillas.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nombre} (ID: {p.id})
-                </option>
-              ))}
+              <option value="BLANCO">📄 Nueva Plantilla en Blanco</option>
+              {plantillas.length > 0 && (
+                <optgroup label="Plantillas Personalizadas">
+                  {plantillas.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre} (ID: {p.id})
+                    </option>
+                  ))}
+                </optgroup>
+              )}
               <optgroup label="Plantillas Predefinidas">
                 {PLANTILLAS_PREDEFINIDAS.map((p) => (
                   <option key={p.id} value={p.id}>
