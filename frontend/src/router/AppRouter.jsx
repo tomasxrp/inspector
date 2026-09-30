@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/shared/ProtectedRoute';
 import AppLayout from '../components/layout/AppLayout';
 import LoginPage from '../features/auth/LoginPage';
+import RegisterPage from '../features/auth/RegisterPage';
 import PropiedadesPage from '../features/propiedades/PropiedadesPage';
 import PropiedadForm from '../features/propiedades/PropiedadForm';
 import PropiedadRevisiones from '../features/propiedades/PropiedadRevisiones';
@@ -18,8 +19,10 @@ export default function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro" element={<RegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
+
           <Route element={<AppLayout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
 

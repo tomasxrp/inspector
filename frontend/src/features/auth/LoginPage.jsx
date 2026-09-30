@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../store/authStore';
 import { loginService } from './authService';
 
@@ -7,17 +7,25 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ correo: '', contrasena: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    const correoLimpio = form.correo.trim().toLowerCase();
+    if (!correoLimpio || !form.contrasena) {
+      setError('Por favor ingresa tu correo y contraseña');
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await loginService(form.correo, form.contrasena);
+      const res = await loginService(correoLimpio, form.contrasena);
       login({ token: res.data.token, usuario: res.data.usuario });
-      navigate('/propiedades');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error ?? 'Error al iniciar sesión');
     } finally {
@@ -26,7 +34,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 relative">
       {/* Background grid */}
       <div
         className="absolute inset-0 opacity-5 pointer-events-none"
@@ -56,7 +64,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-zinc-900 border border-zinc-800 p-6">
+        <div className="bg-zinc-900 border border-zinc-800 p-6 shadow-2xl">
           <div className="mb-5 pb-4 border-b border-zinc-800">
             <h2 className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-amber-400">
               Acceso al sistema
@@ -81,11 +89,20 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 mb-1.5">
-                Contraseña
-              </label>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400">
+                  Contraseña
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-[10px] font-mono text-amber-500 hover:text-amber-400 uppercase tracking-wider"
+                >
+                  {showPassword ? 'Ocultar' : 'Mostrar'}
+                </button>
+              </div>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
                 value={form.contrasena}
@@ -109,12 +126,25 @@ export default function LoginPage() {
               {loading ? 'Verificando...' : 'Ingresar →'}
             </button>
           </form>
+
+          {/* Enlace al registro */}
+          <div className="mt-6 pt-5 border-t border-zinc-800 text-center">
+            <p className="text-xs font-mono text-zinc-400">
+              ¿No tienes una cuenta aún?{' '}
+              <Link
+                to="/registro"
+                className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-4 transition-colors"
+              >
+                Regístrate aquí
+              </Link>
+            </p>
+          </div>
         </div>
 
         <p className="text-center text-zinc-600 text-xs font-mono mt-6 uppercase tracking-widest">
-          Inspect App © 2026
+          Inspect App © 2026 · Seguridad y Privacidad
         </p>
       </div>
     </div>
   );
-}
+}

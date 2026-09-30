@@ -24,16 +24,22 @@ model Usuario {
   direccion   String?
   propiedades Propiedad[]
   revisiones  Revision[]
+  clientes    Cliente[]
 }
 
 model Cliente {
   id          Int         @id @default(autoincrement())
+  id_usuario  Int
   nombre      String
   apellido    String
-  correo      String      @unique
+  correo      String
   telefono    String
+  usuario     Usuario     @relation(fields: [id_usuario], references: [id])
   propiedades Propiedad[]
+
+  @@unique([id_usuario, correo])
 }
+
 
 model Propiedad {
   id             Int        @id @default(autoincrement())

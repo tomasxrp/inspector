@@ -5,9 +5,7 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Modal from '../../components/ui/Modal';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
-import { getPropiedades } from '../propiedades/propiedadService';
-import { getRevisionesPorPropiedad, eliminarRevision } from './revisionService';
-import { getClientes } from '../clientes/clienteService';
+import { getRevisiones, eliminarRevision } from './revisionService';
 import { formatDisplayDate } from '../../utils/dateUtils';
 
 export default function RevisionesPage() {
@@ -19,28 +17,8 @@ export default function RevisionesPage() {
 
   const fetchAll = async () => {
     try {
-      const [propRes, clientesRes] = await Promise.all([
-        getPropiedades(),
-        getClientes(),
-      ]);
-      const propiedades = propRes.data;
-      const clientes = clientesRes.data;
-      const clienteMap = {};
-      clientes.forEach((c) => { clienteMap[c.id] = c; });
-
-      const grupos = await Promise.all(
-        propiedades.map((p) =>
-          getRevisionesPorPropiedad(p.id)
-            .then((r) =>
-              r.data.map((rev) => ({
-                ...rev,
-                propiedad: { ...p, cliente: clienteMap[p.id_cliente] ?? null },
-              }))
-            )
-            .catch(() => [])
-        )
-      );
-      setRevisiones(grupos.flat().sort((a, b) => b.id - a.id));
+      const res = await getRevisiones();
+      setRevisiones(res.data);
     } catch {
       // silently fail
     } finally {
@@ -49,6 +27,7 @@ export default function RevisionesPage() {
   };
 
   useEffect(() => { fetchAll(); }, []); // eslint-disable-line
+
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
