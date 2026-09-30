@@ -13,6 +13,9 @@ import RevisionForm from '../features/revisiones/RevisionForm';
 import RevisionDetalle from '../features/revisiones/RevisionDetalle';
 import InformePage from '../features/informes/InformePage';
 import DashboardPage from '../features/dashboard/DashboardPage';
+import PresupuestosPage from '../features/presupuestos/PresupuestosPage';
+import PresupuestoForm from '../features/presupuestos/PresupuestoForm';
+import PresupuestoDetalle from '../features/presupuestos/PresupuestoDetalle';
 
 export default function AppRouter() {
   return (
@@ -46,6 +49,12 @@ export default function AppRouter() {
             <Route path="revisiones/nueva" element={<RevisionForm />} />
             <Route path="revisiones/:id" element={<RevisionDetalle />} />
             <Route path="revisiones/:id/informe" element={<InformePage />} />
+
+            {/* Presupuestos e Itemizados Oficiales NCh 1156 */}
+            <Route path="presupuestos" element={<PresupuestosPage />} />
+            <Route path="presupuestos/nuevo" element={<PresupuestoForm />} />
+            <Route path="presupuestos/:id" element={<PresupuestoDetalle />} />
+            <Route path="presupuestos/:id/editar" element={<PresupuestoForm />} />
           </Route>
         </Route>
 

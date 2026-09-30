@@ -6,6 +6,7 @@ const navItems = [
   { to: '/propiedades', label: 'Propiedades', icon: '🏠' },
   { to: '/clientes', label: 'Clientes', icon: '👤' },
   { to: '/revisiones', label: 'Revisiones', icon: '📋' },
+  { to: '/presupuestos', label: 'Presupuestos', icon: '🏗️' },
 ];
 
 export default function Sidebar() {

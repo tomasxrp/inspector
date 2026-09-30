@@ -9,6 +9,8 @@ import informeRoutes from './routes/informe.routes.js';
 import revisionRoutes from './routes/revision.routes.js';
 import imagenRoutes from './routes/imagen.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import presupuestoRoutes from './routes/presupuesto.routes.js';
+import plantillaRoutes from './routes/plantilla.routes.js';
 
 dotenv.config();
 
@@ -30,6 +32,8 @@ app.use('/api/revisiones', revisionRoutes);
 app.use('/api/informes', informeRoutes);
 app.use('/api/imagenes', imagenRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/presupuestos', presupuestoRoutes);
+app.use('/api/plantillas', plantillaRoutes);
 
 
 const PORT = process.env.PORT || 3000;

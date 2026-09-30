@@ -25,6 +25,7 @@ model Usuario {
   propiedades Propiedad[]
   revisiones  Revision[]
   clientes    Cliente[]
+  presupuestos Presupuesto[]
 }
 
 model Cliente {
@@ -92,4 +93,28 @@ model informe_revision {
   fecha_emision         DateTime @default(now())
   url_pdf               String?
   revision              Revision @relation(fields: [id_revision], references: [id])
+}
+
+model Presupuesto {
+  id              Int      @id @default(autoincrement())
+  id_usuario      Int
+  nombre_proyecto String
+  mandante        String
+  contratista     String
+  ubicacion       String
+  fecha           DateTime @default(now())
+  porcentaje_gg   Float    @default(10.0)
+  porcentaje_util Float    @default(10.0)
+  items           Json
+  totales         Json?
+  usuario         Usuario  @relation(fields: [id_usuario], references: [id])
+}
+
+model Plantilla {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  items           Json
+  fecha_creacion  DateTime @default(now())
+  fecha_actualizacion DateTime @updatedAt
 }
